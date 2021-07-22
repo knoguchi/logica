@@ -22,12 +22,14 @@ if '.' not in __package__:
   from compiler.dialect_libraries import sqlite_library
   from compiler.dialect_libraries import trino_library
   from compiler.dialect_libraries import presto_library
+  from compiler.dialect_libraries import clickhouse_library
 else:
   from ..compiler.dialect_libraries import bq_library
   from ..compiler.dialect_libraries import psql_library
   from ..compiler.dialect_libraries import sqlite_library
   from ..compiler.dialect_libraries import trino_library
   from ..compiler.dialect_libraries import presto_library
+  from ..compiler.dialect_libraries import clickhouse_library
 
 def Get(engine):
   return DIALECTS[engine]()
@@ -214,12 +216,32 @@ class Presto(Dialect):
   def GroupBySpecBy(self):
     return 'index'
 
+class ClickHouseDialect(Dialect):
+
+  def Name(self):
+    return 'ClickHouse'
+
+  def BuiltInFunctions(self):
+    return {
+        'Range': '(SELECT groupArray(x) FROM numbers(0, {0}) as x)',
+        'ToString': 'CAST(%s AS TEXT)',
+        'Size': 'length(%s, 1)',
+        'Count': 'COUNT(DISTINCT {0})'
+      }
+
+  def InfixOperators(self):
+    return {
+    }
+
+  def LibraryProgram(self):
+    return clickhouse_library.library
 
 DIALECTS = {
     'bigquery': BigQueryDialect,
     'sqlite': SqLiteDialect,
     'psql': PostgreSQL,
     'presto': Presto,
-    'trino': Trino
+    'trino': Trino,
+    'clickhouse': ClickHouseDialect
 }
 

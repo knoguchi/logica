@@ -214,6 +214,13 @@ def main(argv):
                               ['--output-format=ALIGNED']),
                               stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         o, _ = p.communicate(formatted_sql.encode())
+      elif engine == 'clickhouse':
+        p = subprocess.Popen(['clickhouse-client', '--multiline', '--multiquery'] +
+                             (['--format', 'CSV'] if command == 'run_to_csv' else []),
+                             stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        commands = []
+        o, _ = p.communicate(
+            '\n'.join(commands + [formatted_sql]).encode())
       else:
         assert False, 'Unknown engine: %s' % engine
       print(o.decode())

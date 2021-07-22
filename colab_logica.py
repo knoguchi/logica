@@ -148,7 +148,7 @@ def RunSQL(sql, engine, connection=None, is_final=False):
       pass
     return None
   else:
-    raise Exception('Logica only supports BigQuery, PostgreSQL and SQLite '
+    raise Exception('Logica only supports BigQuery, PostgreSQL, SQLite and ClickHouse '
                     'for now.')
 
 
